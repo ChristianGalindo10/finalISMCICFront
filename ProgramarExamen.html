@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programar Examen - Profesor</title>
+    <style>
+        /* General Reset: Elimina márgenes y rellenos predeterminados y define la fuente base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Layout Styling: Configuración básica del cuerpo de la página */
+        body {
+            display: flex; /* Hace que el cuerpo sea un contenedor flexible */
+            background-color: #f9f9f9; /* Color de fondo */
+            color: #333; /* Color de texto */
+        }
+
+        /* Estilos para la barra lateral (sidebar) */
+        .sidebar {
+            width: 250px; /* Ancho de la barra lateral */
+            background-color: #2e3a4e; /* Color de fondo */
+            color: white; /* Color de texto */
+            display: flex; /* Disposición flexible */
+            flex-direction: column; /* Ordena los elementos en columna */
+            justify-content: space-between; /* Distribuye el espacio entre elementos */
+            padding: 20px; /* Espaciado interno */
+            min-height: 100vh; /* Altura mínima para ocupar toda la pantalla */
+        }
+
+        /* Estilos para los enlaces dentro de la barra lateral */
+        .sidebar a {
+            text-decoration: none; /* Sin subrayado */
+            color: white; /* Color de texto */
+            display: block; /* Ocupa todo el ancho */
+            margin: 20px 0; /* Espaciado vertical */
+            font-size: 18px; /* Tamaño de fuente */
+            display: flex; /* Disposición flexible */
+            align-items: center; /* Alinea los elementos en el centro verticalmente */
+        }
+
+        /* Espaciado para el icono dentro del enlace de la barra lateral */
+        .sidebar a img {
+            margin-right: 10px; /* Margen a la derecha del icono */
+        }
+
+        /* Estilos para el enlace "Cerrar sesión" */
+        .logout {
+            font-size: 16px; /* Tamaño de fuente */
+            color: #ff6b6b; /* Color de texto */
+            cursor: pointer; /* Cambia el cursor al pasar sobre el texto */
+            text-align: center; /* Centra el texto */
+            margin-top: auto; /* Empuja el enlace a la parte inferior de la barra */
+            padding: 10px 0; /* Espaciado interno */
+        }
+
+        /* Estilos para el contenido principal */
+        .content {
+            flex: 1; /* Ocupa el espacio restante */
+            padding: 40px; /* Espaciado interno */
+        }
+
+        /* Estilos para el formulario de programar examen */
+        .exam-form-container {
+            background-color: white; /* Color de fondo */
+            padding: 30px; /* Espaciado interno */
+            border-radius: 8px; /* Bordes redondeados */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+            max-width: 700px; /* Ancho máximo del formulario */
+            margin: 0 auto; /* Centrado horizontal */
+        }
+
+        /* Título del formulario */
+        .exam-form-container h2 {
+            text-align: center; /* Centra el título */
+            margin-bottom: 20px; /* Espaciado inferior */
+        }
+
+        /* Estilos para los inputs de fecha y hora */
+        .exam-form-container input[type="text"] {
+            width: 48%; /* Ancho dividido para dos elementos */
+            padding: 10px; /* Espaciado interno */
+            margin-bottom: 15px; /* Espaciado inferior */
+            border: 1px solid #ccc; /* Borde */
+            border-radius: 5px; /* Bordes redondeados */
+            margin-right: 2%; /* Espacio entre los dos inputs */
+        }
+
+        /* Estilos para la sección de preguntas */
+        .questions {
+            margin-top: 20px; /* Espaciado superior */
+        }
+
+        .gray-box {
+            background-color: #e0e0e0; /* Color de fondo */
+            padding: 8px; /* Espaciado interno */
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: 500; /* Fuente semi-negrita */
+            color: #555; /* Color de texto */
+            display: inline-block; /* Alinea las preguntas en fila */
+            width: 65%; /* Ancho del contenedor de descripción */
+            margin-bottom: 10px; /* Espaciado inferior */
+        }
+
+        .question-type {
+            background-color: #5f4b8b; /* Color de fondo */
+            color: white; /* Color de texto */
+            padding: 8px 15px; /* Espaciado interno */
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: 500; /* Fuente semi-negrita */
+            margin-left: 10px; /* Espaciado entre descripción y tipo */
+        }
+
+        /* Botón para agregar nueva pregunta */
+        .add-question {
+            background-color: #5f4b8b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Estilos para los selectores de lugar y grupo */
+        .exam-form-container select {
+            width: 100%; /* Ancho completo */
+            padding: 10px; /* Espaciado interno */
+            margin-bottom: 15px; /* Espaciado inferior */
+            border: 1px solid #ccc; /* Borde */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+
+        /* Estilos para el botón de "Programar" */
+        .button-submit {
+            background-color: #333; /* Color de fondo */
+            color: white; /* Color de texto */
+            border: none; /* Sin borde */
+            border-radius: 20px; /* Bordes redondeados */
+            padding: 10px 20px; /* Espaciado interno */
+            cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+            font-size: 16px; /* Tamaño de fuente */
+            margin-top: 20px; /* Espaciado superior */
+            display: block; /* Para centrarlo */
+            margin-left: auto; /* Alinea a la derecha */
+        }
+
+        /* Footer Styling: Estilos para el pie de página sin iconos */
+        .footer {
+            background-color: #f1f1f1; /* Color de fondo */
+            padding: 20px; /* Espaciado interno */
+            text-align: center; /* Centrado del texto */
+            display: flex; /* Disposición flexible */
+            justify-content: space-between; /* Distribuye el espacio entre los elementos */
+            align-items: center; /* Alinea verticalmente al centro */
+        }
+
+        /* Estilo para los enlaces del pie de página */
+        .footer-links {
+            text-align: right; /* Alinea el texto a la derecha */
+        }
+
+        .footer-links a {
+            text-decoration: none; /* Sin subrayado */
+            color: #333; /* Color de texto */
+            margin-left: 15px; /* Margen a la izquierda */
+            font-size: 14px; /* Tamaño de fuente */
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra lateral con el menú de usuario -->
+    <div class="sidebar">
+        <div>
+            <!-- Enlace al perfil de usuario -->
+            <a href="#"><img src="user-icon.png" alt="Usuario" style="width:24px; vertical-align:middle;"> Usuario</a>
+            <!-- Enlace para acceder a las asignaturas -->
+            <a href="#">Asignaturas</a>
+        </div>
+        <!-- Enlace para cerrar sesión -->
+        <div class="logout">Cerrar sesión</div>
+    </div>
+
+    <!-- Contenido principal con el formulario de programar examen -->
+    <div class="content">
+        <div class="exam-form-container">
+            <h2>Programar Examen Asignatura</h2>
+            
+            <!-- Campos de fecha y hora -->
+            <input type="text" placeholder="Fecha">
+            <input type="text" placeholder="Hora">
+
+            <!-- Sección de preguntas -->
+            <div class="questions">
+                <div>
+                    <span class="gray-box">1. Descripción..........................................</span>
+                    <span class="question-type">Selección múltiple</span>
+                </div>
+                <div>
+                    <span class="gray-box">2. Descripción..........................................</span>
+                    <span class="question-type">Verdadero/Falso</span>
+                </div>
+                <!-- Botón para agregar nueva pregunta -->
+                <button class="add-question">+</button>
+            </div>
+
+            <!-- Selectores de lugar y grupo -->
+            <label>Lugar:</label>
+            <select>
+                <option>Virtual</option>
+                <option>Salón 1</option>
+                <option>Salón 2</option>
+            </select>
+
+            <label>Grupo n:</label>
+            <select>
+                <option>Grupo 1</option>
+                <option>Grupo 2</option>
+                <option>Grupo 3</option>
+            </select>
+
+            <!-- Botón para enviar el formulario -->
+            <button class="button-submit">Programar</button>
+        </div>
+    </div>
+
+    <!-- Pie de página con enlaces de recursos -->
+
+        </div>
+    </div>
+</body>
+</html>

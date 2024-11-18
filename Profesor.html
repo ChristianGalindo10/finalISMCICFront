@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asignaturas - Profesor</title>
+    <style>
+      /* General Reset: Elimina márgenes y rellenos predeterminados y define la fuente base */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      /* Layout Styling: Configuración básica del cuerpo de la página */
+      body {
+        display: flex; /* Hace que el cuerpo sea un contenedor flexible */
+        background-color: #f9f9f9; /* Color de fondo */
+        color: #333; /* Color de texto */
+      }
+
+      /* Estilos para la barra lateral (sidebar) */
+      .sidebar {
+        width: 250px; /* Ancho de la barra lateral */
+        background-color: #2e3a4e; /* Color de fondo */
+        color: white; /* Color de texto */
+        display: flex; /* Disposición flexible */
+        flex-direction: column; /* Ordena los elementos en columna */
+        justify-content: space-between; /* Distribuye el espacio entre elementos */
+        padding: 20px; /* Espaciado interno */
+        min-height: 100vh; /* Altura mínima para ocupar toda la pantalla */
+      }
+
+      /* Estilos para los enlaces dentro de la barra lateral */
+      .sidebar a {
+        text-decoration: none; /* Sin subrayado */
+        color: white; /* Color de texto */
+        display: block; /* Ocupa todo el ancho */
+        margin: 20px 0; /* Espaciado vertical */
+        font-size: 18px; /* Tamaño de fuente */
+        display: flex; /* Disposición flexible */
+        align-items: center; /* Alinea los elementos en el centro verticalmente */
+      }
+
+      /* Espaciado para el icono dentro del enlace de la barra lateral */
+      .sidebar a img {
+        margin-right: 10px; /* Margen a la derecha del icono */
+      }
+
+      /* Estilos para el enlace "Cerrar sesión" */
+      .logout {
+        font-size: 16px; /* Tamaño de fuente */
+        color: #ff6b6b; /* Color de texto */
+        cursor: pointer; /* Cambia el cursor al pasar sobre el texto */
+        text-align: center; /* Centra el texto */
+        margin-top: auto; /* Empuja el enlace a la parte inferior de la barra */
+        padding: 10px 0; /* Espaciado interno */
+      }
+
+      /* Estilos para el contenido principal */
+      .content {
+        flex: 1; /* Ocupa el espacio restante */
+        padding: 40px; /* Espaciado interno */
+      }
+
+      /* Table Styling: Estilos para la tabla de asignaturas */
+      table {
+        width: 100%; /* Ocupa el 100% del ancho disponible */
+        border-collapse: collapse; /* Colapsa los bordes de las celdas */
+        margin-top: 20px; /* Espacio superior */
+        background-color: white; /* Color de fondo */
+        border-radius: 8px; /* Bordes redondeados */
+        overflow: hidden; /* Oculta el desbordamiento */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra alrededor de la tabla */
+      }
+
+      /* Estilos para las celdas de la tabla */
+      th,
+      td {
+        padding: 15px; /* Espaciado interno */
+        text-align: center; /* Centrado del texto */
+        font-size: 16px; /* Tamaño de fuente */
+      }
+
+      /* Estilos específicos para las celdas de encabezado */
+      th {
+        background-color: #f1f1f1; /* Color de fondo */
+        color: #555; /* Color de texto */
+        font-weight: 600; /* Negrita */
+      }
+
+      /* Estilos para las celdas de datos */
+      td {
+        background-color: #fafafa; /* Color de fondo */
+        color: #333; /* Color de texto */
+      }
+
+      /* Estilo para las cajas grises dentro de las celdas de asignaturas */
+      .gray-box {
+        background-color: #e0e0e0; /* Color de fondo */
+        padding: 8px; /* Espaciado interno */
+        border-radius: 5px; /* Bordes redondeados */
+        font-weight: 500; /* Fuente semi-negrita */
+        color: #555; /* Color de texto */
+      }
+
+      /* Button Styling: Estilos para los botones de acción */
+      .button-action {
+        background-color: #5f4b8b; /* Color de fondo */
+        color: white; /* Color de texto */
+        border: none; /* Sin borde */
+        border-radius: 20px; /* Bordes redondeados */
+        padding: 8px 20px; /* Espaciado interno */
+        cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+        transition: background-color 0.3s ease; /* Transición suave al cambiar de color */
+      }
+
+      /* Efecto hover para los botones */
+      .button-action:hover {
+        background-color: #4a3a6b; /* Color de fondo al pasar el cursor */
+      }
+
+      /* Footer Styling: Estilos para el pie de página */
+      .footer {
+        background-color: #f1f1f1; /* Color de fondo */
+        padding: 20px; /* Espaciado interno */
+        text-align: center; /* Centrado del texto */
+        display: flex; /* Disposición flexible */
+        justify-content: space-between; /* Distribuye el espacio entre los elementos */
+        align-items: center; /* Alinea verticalmente al centro */
+      }
+
+      /* Estilo para los iconos dentro del pie de página */
+      .footer-icons img {
+        width: 24px; /* Ancho de los iconos */
+        margin: 0 5px; /* Espaciado horizontal */
+      }
+
+      /* Estilo para los enlaces del pie de página */
+      .footer-links {
+        text-align: right; /* Alinea el texto a la derecha */
+      }
+
+      .footer-links a {
+        text-decoration: none; /* Sin subrayado */
+        color: #333; /* Color de texto */
+        margin-left: 15px; /* Margen a la izquierda */
+        font-size: 14px; /* Tamaño de fuente */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Barra lateral con el menú de usuario -->
+    <div class="sidebar">
+      <div>
+        <!-- Enlace al perfil de usuario -->
+        <a href="#"
+          ><img
+            src="user-icon.png"
+            alt="Usuario"
+            style="width: 24px; vertical-align: middle"
+          />
+          Usuario</a
+        >
+        <!-- Enlace para acceder a las asignaturas -->
+        <a href="#">Asignaturas</a>
+      </div>
+      <!-- Enlace para cerrar sesión -->
+      <div class="logout">Cerrar sesión</div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="content">
+      <h2>Asignaturas</h2>
+      <table id="myTable">
+        <thead>
+          <tr>
+            <th>Asignatura</th>
+            <th>Asociar pregunta</th>
+            <th>Programar examen</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+
+        <!-- Fila de ejemplo con botones de acción para cada asignatura -->
+        <!-- <tr>
+          <td><div class="gray-box">Asignatura1</div></td>
+          <td><button class="button-action">Asociar</button></td>
+          <td><button class="button-action">Programar</button></td>
+        </tr>
+        <tr>
+          <td><div class="gray-box">Asignatura2</div></td>
+          <td><button class="button-action">Asociar</button></td>
+          <td><button class="button-action">Programar</button></td>
+        </tr>
+        <tr>
+          <td><div class="gray-box">Asignatura3</div></td>
+          <td><button class="button-action">Asociar</button></td>
+          <td><button class="button-action">Programar</button></td>
+        </tr>
+        <tr>
+          <td><div class="gray-box">Asignatura4</div></td>
+          <td><button class="button-action">Asociar</button></td>
+          <td><button class="button-action">Programar</button></td>
+        </tr>
+        <tr>
+          <td><div class="gray-box">Asignatura5</div></td>
+          <td><button class="button-action">Asociar</button></td>
+          <td><button class="button-action">Programar</button></td>
+        </tr> -->
+      </table>
+    </div>
+    <script>
+      async function loadData() {
+        const data = JSON.parse(localStorage.getItem("itemData"));
+        console.log(data);
+        const table = document
+          .getElementById("myTable")
+          .getElementsByTagName("tbody")[0];
+        try {
+          // Envía los datos al endpoint
+          const response = await fetch(
+            "http://localhost:3000/imparte/" + data.id,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          console.log(response);
+
+          // Maneja la respuesta
+          if (response.ok) {
+            const result = await response.json();
+            //alert("Datos enviados correctamente: " + JSON.stringify(result));
+            console.log(result);
+
+            result.forEach((asignatura) => {
+              const newRow = table.insertRow();
+              // Insertar celdas en la fila
+              const cell1 = newRow.insertCell(0);
+              const cell2 = newRow.insertCell(1);
+              const cell3 = newRow.insertCell(2);
+              // Asignar contenido a las celdas
+              cell1.innerHTML = `<div class="gray-box">${asignatura.nom_a}</div>`; // ID dinámico
+              const asociarBtn = document.createElement("button");
+              asociarBtn.textContent = "Asociar";
+              asociarBtn.className = "button-action";
+              asociarBtn.addEventListener("click", () =>
+                asociar(asignatura)
+              );
+              cell2.appendChild(asociarBtn);
+
+              const programarBtn = document.createElement("button");
+              programarBtn.textContent = "Programar";
+              programarBtn.className = "button-action";
+              programarBtn.addEventListener("click", () =>
+                programar(asignatura)
+              );
+              cell3.appendChild(programarBtn);
+            });
+          } else {
+            const result = await response.json();
+            console.log(result);
+            alert("Error al enviar los datos: " + result.message);
+          }
+        } catch (error) {
+          alert("Error al conectar con el servidor: " + error.message);
+        }
+      }
+
+      function asociar(asignatura) {
+        localStorage.setItem('asignatura', JSON.stringify(asignatura));
+        window.location.href = 'AsociarPregunta.html';
+      }
+
+      function programar(asignatura) {
+        localStorage.setItem('asignatura', JSON.stringify(asignatura));
+      }
+
+      loadData();
+    </script>
+  </body>
+</html>

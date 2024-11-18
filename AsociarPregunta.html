@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agregar Pregunta - Profesor</title>
+    <style>
+      /* General Reset: Elimina márgenes y rellenos predeterminados y define la fuente base */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      /* Layout Styling: Configuración básica del cuerpo de la página */
+      body {
+        display: flex; /* Hace que el cuerpo sea un contenedor flexible */
+        background-color: #f9f9f9; /* Color de fondo */
+        color: #333; /* Color de texto */
+      }
+
+      /* Estilos para la barra lateral (sidebar) */
+      .sidebar {
+        width: 250px; /* Ancho de la barra lateral */
+        background-color: #2e3a4e; /* Color de fondo */
+        color: white; /* Color de texto */
+        display: flex; /* Disposición flexible */
+        flex-direction: column; /* Ordena los elementos en columna */
+        justify-content: space-between; /* Distribuye el espacio entre elementos */
+        padding: 20px; /* Espaciado interno */
+        min-height: 100vh; /* Altura mínima para ocupar toda la pantalla */
+      }
+
+      /* Estilos para los enlaces dentro de la barra lateral */
+      .sidebar a {
+        text-decoration: none; /* Sin subrayado */
+        color: white; /* Color de texto */
+        display: block; /* Ocupa todo el ancho */
+        margin: 20px 0; /* Espaciado vertical */
+        font-size: 18px; /* Tamaño de fuente */
+        display: flex; /* Disposición flexible */
+        align-items: center; /* Alinea los elementos en el centro verticalmente */
+      }
+
+      /* Espaciado para el icono dentro del enlace de la barra lateral */
+      .sidebar a img {
+        margin-right: 10px; /* Margen a la derecha del icono */
+      }
+
+      /* Estilos para el enlace "Cerrar sesión" */
+      .logout {
+        font-size: 16px; /* Tamaño de fuente */
+        color: #ff6b6b; /* Color de texto */
+        cursor: pointer; /* Cambia el cursor al pasar sobre el texto */
+        text-align: center; /* Centra el texto */
+        margin-top: auto; /* Empuja el enlace a la parte inferior de la barra */
+        padding: 10px 0; /* Espaciado interno */
+      }
+
+      /* Estilos para el contenido principal */
+      .content {
+        flex: 1; /* Ocupa el espacio restante */
+        padding: 40px; /* Espaciado interno */
+      }
+
+      /* Estilos para el formulario de agregar pregunta */
+      .question-form-container {
+        background-color: white; /* Color de fondo */
+        padding: 30px; /* Espaciado interno */
+        border-radius: 8px; /* Bordes redondeados */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+        max-width: 600px; /* Ancho máximo del formulario */
+        margin: 0 auto; /* Centrado horizontal */
+      }
+
+      /* Título del formulario */
+      .question-form-container h2 {
+        text-align: center; /* Centra el título */
+        margin-bottom: 20px; /* Espaciado inferior */
+      }
+
+      /* Estilos para el select y los inputs */
+      .question-form-container select,
+      .question-form-container input[type="text"],
+      .question-form-container input[type="number"] {
+        width: 100%; /* Ancho completo */
+        padding: 10px; /* Espaciado interno */
+        margin-bottom: 15px; /* Espaciado inferior */
+        border: 1px solid #ccc; /* Borde */
+        border-radius: 5px; /* Bordes redondeados */
+      }
+
+      /* Estilos para la sección de opciones de respuestas */
+      .options {
+        margin-top: 10px; /* Espaciado superior */
+        display: flex; /* Disposición flexible */
+        flex-direction: column; /* Ordena los elementos en columna */
+        gap: 10px; /* Espacio entre opciones */
+      }
+
+      /* Estilo para los checkboxes de opciones */
+      .options label {
+        display: flex; /* Flex para alinear el checkbox y el texto */
+        align-items: center; /* Centra verticalmente */
+        font-size: 16px; /* Tamaño de fuente */
+        color: #555; /* Color de texto */
+      }
+
+      /* Estilos para el botón de "Asociar" */
+      .button-submit {
+        background-color: #333; /* Color de fondo */
+        color: white; /* Color de texto */
+        border: none; /* Sin borde */
+        border-radius: 20px; /* Bordes redondeados */
+        padding: 10px 20px; /* Espaciado interno */
+        cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+        font-size: 16px; /* Tamaño de fuente */
+        margin-top: 20px; /* Espaciado superior */
+        display: block; /* Para centrarlo */
+        margin-left: auto; /* Alinea a la derecha */
+      }
+
+      .footer-links a {
+        text-decoration: none; /* Sin subrayado */
+        color: #333; /* Color de texto */
+        margin-left: 15px; /* Margen a la izquierda */
+        font-size: 14px; /* Tamaño de fuente */
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <!-- Barra lateral con el menú de usuario -->
+    <div class="sidebar">
+      <div>
+        <!-- Enlace al perfil de usuario -->
+        <a href="#"
+          ><img
+            src="user-icon.png"
+            alt="Usuario"
+            style="width: 24px; vertical-align: middle"
+          />
+          Usuario</a
+        >
+        <!-- Enlace para acceder a las asignaturas -->
+        <a href="#">Asignaturas</a>
+      </div>
+      <!-- Enlace para cerrar sesión -->
+      <div class="logout">Cerrar sesión</div>
+    </div>
+
+    <!-- Contenido principal con el formulario de agregar pregunta -->
+    <div class="content">
+      <div class="question-form-container">
+        <h2 id="titulo">Agregar pregunta ...</h2>
+
+        <!-- Selección del tipo de pregunta -->
+        <label for="tipo">Tipo</label>
+        <select id="tipo" onchange="handleChange(this)">
+          <option value="1">Selección múltiple</option>
+          <option value="2">Selección única</option>
+          <option value="3">Verdadero/Falso</option>
+        </select>
+
+        <!-- Campo de descripción de la pregunta -->
+        <label for="descripcion">Descripción</label>
+        <input
+          type="text"
+          id="descripcion"
+          placeholder="Escribe la descripción de la pregunta"
+        />
+
+        <label for="tiempo">Tiempo</label>
+        <input type="number" id="tiempo" min="1" value="1" />
+
+        <!-- Opciones de respuestas -->
+        <div class="options">
+          <label for="descripcion">Respuestas</label>
+          <div id="options2">
+            <form id="checkboxForm">
+              <div>
+                <label
+                  ><input
+                    type="checkbox"
+                    id="option1"
+                    name="item"
+                    value="1"
+                    style="margin-right: 5px"
+                  />
+                  a)</label
+                >
+                <input type="text" id="text1" placeholder="Escribe aquí..." />
+              </div>
+
+              <div>
+                <label
+                  ><input
+                    type="checkbox"
+                    id="option2"
+                    name="item"
+                    value="2"
+                    style="margin-right: 5px"
+                  />
+                  b)</label
+                >
+                <input type="text" id="text2" placeholder="Escribe aquí..." />
+              </div>
+
+              <div>
+                <label
+                  ><input
+                    type="checkbox"
+                    id="option3"
+                    name="item"
+                    value="3"
+                    style="margin-right: 5px"
+                  />
+                  c)</label
+                >
+                <input type="text" id="text3" placeholder="Escribe aquí..." />
+              </div>
+
+              <div>
+                <label
+                  ><input
+                    type="checkbox"
+                    id="option4"
+                    name="item"
+                    value="4"
+                    style="margin-right: 5px"
+                  />
+                  d)</label
+                >
+                <input type="text" id="text4" placeholder="Escribe aquí..." />
+              </div>
+            </form>
+          </div>
+          <!-- <label><input type="checkbox"> Respuesta 1</label>
+                <label><input type="checkbox"> Respuesta 2</label>
+                <label><input type="checkbox"> Respuesta 3</label>
+                <label><input type="checkbox"> Respuesta 4</label> -->
+        </div>
+
+        <!-- Botón para enviar el formulario -->
+        <button id="asociarBtn" class="button-submit">Asociar</button>
+      </div>
+    </div>
+    <script>
+      const user = JSON.parse(localStorage.getItem("itemData"));
+      const asignatura = JSON.parse(localStorage.getItem("asignatura"));
+      const multipleHTML = `<form id="checkboxForm">
+                  <div>
+                    <label
+                      ><input
+                        type="checkbox"
+                        id="option1"
+                        name="item"
+                        value="1"
+                        style="margin-right: 5px"
+                      />
+                      a)</label
+                    >
+                    <input type="text" id="text1" placeholder="Escribe aquí..." />
+                  </div>
+
+                  <div>
+                    <label
+                      ><input
+                        type="checkbox"
+                        id="option2"
+                        name="item"
+                        value="2"
+                        style="margin-right: 5px"
+                      />
+                      b)</label
+                    >
+                    <input type="text" id="text2" placeholder="Escribe aquí..." />
+                  </div>
+
+                  <div>
+                    <label
+                      ><input
+                        type="checkbox"
+                        id="option3"
+                        name="item"
+                        value="3"
+                        style="margin-right: 5px"
+                      />
+                      c)</label
+                    >
+                    <input type="text" id="text3" placeholder="Escribe aquí..." />
+                  </div>
+
+                  <div>
+                    <label
+                      ><input
+                        type="checkbox"
+                        id="option4"
+                        name="item"
+                        value="4"
+                        style="margin-right: 5px"
+                      />
+                      d)</label
+                    >
+                    <input type="text" id="text4" placeholder="Escribe aquí..." />
+                  </div>
+                </form>`;
+
+      const uniqueHtml = `<form id="radioForm">
+                          <div>
+                            <label
+                              ><input
+                                type="radio"
+                                id="option1"
+                                name="item"
+                                value="1"
+                                style="margin-right: 5px"
+                              />
+                              a)</label
+                            >
+                            <input type="text" id="text1" placeholder="Escribe aquí..." />
+                          </div>
+
+                          <div>
+                            <label
+                              ><input
+                                type="radio"
+                                id="option2"
+                                name="item"
+                                value="2"
+                                style="margin-right: 5px"
+                              />
+                              b)</label
+                            >
+                            <input type="text" id="text2" placeholder="Escribe aquí..." />
+                          </div>
+
+                          <div>
+                            <label
+                              ><input
+                                type="radio"
+                                id="option3"
+                                name="item"
+                                value="3"
+                                style="margin-right: 5px"
+                              />
+                              c)</label
+                            >
+                            <input type="text" id="text3" placeholder="Escribe aquí..." />
+                          </div>
+
+                          <div>
+                            <label
+                              ><input
+                                type="radio"
+                                id="option4"
+                                name="item"
+                                value="4"
+                                style="margin-right: 5px"
+                              />
+                              d)</label
+                            >
+                            <input type="text" id="text4" placeholder="Escribe aquí..." />
+                          </div>
+                        </form>`;
+
+      const vfHtml = `<form id="radioForm">
+                          <div>
+                            <label
+                              ><input
+                                type="radio"
+                                id="option1"
+                                name="item"
+                                value="1"
+                                style="margin-right: 5px"
+                              />
+                              Verdadero</label
+                            >
+                          </div>
+
+                          <div>
+                            <label
+                              ><input
+                                type="radio"
+                                id="option2"
+                                name="item"
+                                value="2"
+                                style="margin-right: 5px"
+                              />
+                              Falso</label
+                            >
+                          </div>
+                        </form>`;
+      console.log(user, asignatura);
+      document.getElementById("titulo").textContent =
+        "Agregar pregunta: " + asignatura.nom_a;
+      const respuestas = document.getElementById("options2");
+
+      function handleChange(selectElement) {
+        const selectedValue = selectElement.value;
+        if (selectedValue == "1") {
+          respuestas.innerHTML = multipleHTML;
+        } else if (selectedValue == "2") {
+          respuestas.innerHTML = uniqueHtml;
+        } else if (selectedValue == "3") {
+          respuestas.innerHTML = vfHtml;
+        }
+      }
+
+      function getCheckboxData() {
+        const checkboxes = document.querySelectorAll('input[name="item"]');
+        let respuestas = [];
+        checkboxes.forEach((checkbox) => {
+          let respuesta;
+          const textInput = document.getElementById("text" + checkbox.value); // Obtener el campo de texto correspondiente
+          if (checkbox.checked) {
+            respuesta = {
+              detalle: textInput.value,
+              correcta: true,
+            };
+          } else {
+            respuesta = {
+              detalle: textInput.value,
+              correcta: false,
+            };
+          }
+          respuestas.push(respuesta);
+        });
+        return respuestas;
+      }
+
+      function getRadioData() {
+        const radios = document.querySelectorAll('input[name="item"]'); // Solo uno puede estar seleccionado
+        let respuestas = [];
+        radios.forEach((radio) => {
+          let respuesta;
+          const textInput = document.getElementById("text" + radio.value); // Obtener el campo de texto correspondiente
+          if (radio.checked) {
+            respuesta = {
+              detalle: textInput.value,
+              correcta: true,
+            };
+          } else {
+            respuesta = {
+              detalle: textInput.value,
+              correcta: false,
+            };
+          }
+          respuestas.push(respuesta);
+        });
+        return respuestas;
+      }
+
+      function getRadioDataVF() {
+        const radios = document.querySelectorAll('input[name="item"]'); // Solo uno puede estar seleccionado
+        let respuestas = [];
+        radios.forEach((radio) => {
+          let detalle;
+          let respuesta;
+          if (radio.value == "1") {
+            detalle = "Verdadero";
+          } else if (radio.value == "2") {
+            detalle = "Falso";
+          }
+          if (radio.checked) {
+            respuesta = {
+              detalle: detalle,
+              correcta: true,
+            };
+          } else {
+            respuesta = {
+              detalle: detalle,
+              correcta: false,
+            };
+          }
+          respuestas.push(respuesta);
+        });
+        return respuestas;
+      }
+
+      const asociarBtn = document.getElementById("asociarBtn");
+      asociarBtn.addEventListener("click", async () => {
+        const selectedValue = document.getElementById("tipo").value;
+        let respuestas;
+        if (selectedValue == "1") {
+          respuestas = getCheckboxData();
+        } else if (selectedValue == "2") {
+          respuestas = getRadioData();
+        } else if (selectedValue == "3") {
+          respuestas = getRadioDataVF();
+        }
+        console.log(respuestas);
+        const obj = {
+          cod_a: asignatura.asignatura_cod_a,
+          enunciado: document.getElementById("descripcion").value,
+          tiempo: +document.getElementById("tiempo").value,
+          respuestas,
+        };
+        console.log(obj);
+        try {
+          // Envía los datos al endpoint
+          const response = await fetch("http://localhost:3000/pregunta", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(obj),
+          });
+
+          console.log(response);
+
+          // Maneja la respuesta
+          if (response.ok) {
+            const result = await response.json();
+            Swal.fire({
+              icon: "success",
+              title: "La pregunta ha sido asociada",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then((result) => {
+                window.location.href = 'Profesor.html';
+            });
+          } else {
+            const result = await response.json();
+            console.log(result);
+            Swal.fire({
+              icon: "error",
+              title: result.message,
+              showConfirmButton: false,
+              timer: 1500,
+            })
+          }
+        } catch (error) {
+          alert("Error al conectar con el servidor: " + error.message);
+        }
+      });
+    </script>
+  </body>
+</html>
