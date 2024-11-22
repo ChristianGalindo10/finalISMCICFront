@@ -167,7 +167,8 @@
           Usuario</a
         >
         <!-- Enlace para acceder a las asignaturas -->
-        <a href="#">Asignaturas</a>
+        <a href="Profesor.html">Asignaturas</a>
+        <a href="ProfesorExamenes.html">Examenes</a>
       </div>
       <!-- Enlace para cerrar sesión -->
       <div class="logout">Cerrar sesión</div>
@@ -199,9 +200,19 @@
       const user = JSON.parse(localStorage.getItem("itemData"));
       const asignatura = JSON.parse(localStorage.getItem("asignatura"));
       const preguntasExamen = JSON.parse(localStorage.getItem("preguntas"));
+      const examenCompleto = JSON.parse(localStorage.getItem("examenCompleto"));
+      const examen = JSON.parse(localStorage.getItem("examen"));
+
       console.log(user, asignatura, preguntasExamen);
-      document.getElementById("titulo").innerText =
+      if(asignatura){
+        document.getElementById("titulo").innerText =
         "Banco preguntas " + asignatura.nom_a;
+      }
+      if(examen){
+        document.getElementById("titulo").innerText =
+        "Banco preguntas " + examen.nom_a;
+      }
+      
       let preguntas = [];
       async function loadData() {
         const table = document
@@ -209,7 +220,9 @@
           .getElementsByTagName("tbody")[0];
         try {
           // Envía los datos al endpoint
-          const response = await fetch(
+          let response;
+          if(asignatura){
+            response = await fetch(
             "http://localhost:3000/pregunta/asignatura/" +
               asignatura.asignatura_cod_a,
             {
@@ -219,6 +232,18 @@
               },
             }
           );
+          }else if(examen){
+            response = await fetch(
+            "http://localhost:3000/pregunta/asignatura/" +
+              examen.cod_a,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+          }
+          
 
           console.log(response);
 
@@ -239,16 +264,46 @@
               cell1.innerText = pregunta.id_pregunta;
               cell2.innerHTML = `<span class="gray-box">${pregunta.enunciado}</div>`;
               cell3.innerText = pregunta.tipo;
-              const encontrado = preguntasExamen.some(pregunta2 => pregunta.id_pregunta === pregunta2.id_pregunta);
-              if(encontrado){
-                cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} checked/>`;
-              }else{
-                cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} />`;
+              let encontrado = false;
+              if (examenCompleto) {
+                encontrado = examenCompleto.preguntas.some(
+                  (pregunta2) => pregunta.id_pregunta === pregunta2.id_pregunta
+                );
+                if (encontrado) {
+                  cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} checked disabled/>`;
+                } else {
+                  if (preguntasExamen) {
+                    encontrado = preguntasExamen.some(
+                      (pregunta2) =>
+                        pregunta.id_pregunta === pregunta2.id_pregunta
+                    );
+                    if (encontrado) {
+                      cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} checked/>`;
+                    } else {
+                      cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} />`;
+                    }
+                  } else {
+                    cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} />`;
+                  }
+                }
+              } else {
+                if (preguntasExamen) {
+                  encontrado = preguntasExamen.some(
+                    (pregunta2) =>
+                      pregunta.id_pregunta === pregunta2.id_pregunta
+                  );
+                  if (encontrado) {
+                    cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} checked/>`;
+                  } else {
+                    cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} />`;
+                  }
+                } else {
+                  cell4.innerHTML = `<input type="checkbox" name="item" value=${pregunta.id_pregunta} />`;
+                }
               }
-              
             });
             preguntas = result;
-            console.log(preguntas)
+            console.log(preguntas);
           } else {
             const result = await response.json();
             console.log(result);
@@ -258,12 +313,11 @@
           alert("Error al conectar con el servidor: " + error.message);
         }
 
-
         const addBtn = document.getElementById("addBtn");
         addBtn.addEventListener("click", () => {
-            console.log(preguntas)
+          console.log(preguntas);
           const checkboxes = document.querySelectorAll(
-            'input[name="item"]:checked'
+            'input[name="item"]:checked:not(:disabled)'
           );
           const idsSeleccionados = Array.from(checkboxes).map((checkbox) =>
             parseInt(checkbox.value)
@@ -271,8 +325,16 @@
           const preguntasSeleccionadas = preguntas.filter((pregunta) =>
             idsSeleccionados.includes(pregunta.id_pregunta)
           );
-          localStorage.setItem('preguntas', JSON.stringify(preguntasSeleccionadas));
-          window.location.href = 'ProgramarExamen.html';
+          localStorage.setItem(
+            "preguntas",
+            JSON.stringify(preguntasSeleccionadas)
+          );
+          if(examen){
+            window.location.href = "EditarExamen.html";
+          }else{
+            window.location.href = "ProgramarExamen.html";
+          }
+          
         });
       }
 

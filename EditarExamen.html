@@ -238,6 +238,7 @@
           id="meeting-time"
           name="meeting-time"
           step="1800"
+          disabled
         />
 
         <!-- Sección de preguntas -->
@@ -259,7 +260,7 @@
 
         <!-- Selectores de lugar y grupo -->
         <label>Lugar:</label>
-        <select id="mySelect"></select>
+        <select id="mySelect" disabled></select>
 
         <input type="checkbox" id="finalizar" />
         <label for="meeting-time"> Finalizar </label>
@@ -271,37 +272,45 @@
 
     <script>
       const user = JSON.parse(localStorage.getItem("itemData"));
-      const asignatura = JSON.parse(localStorage.getItem("asignatura"));
       const preguntas = JSON.parse(localStorage.getItem("preguntas"));
-      const fecha = JSON.parse(localStorage.getItem("fecha"));
+      const examen = JSON.parse(localStorage.getItem("examen"));
+      const examenCompleto = JSON.parse(localStorage.getItem("examenCompleto"));
+      const fechaInput = document.getElementById("meeting-time");
+
+      const select = document.getElementById("mySelect");
 
       const programarBtn = document.getElementById("programarBtn");
       document.getElementById("titulo").innerText =
-        "Programar Examen " + asignatura.nom_a;
-      console.log(user, asignatura, preguntas);
+        "Programar Examen " + examen.nom_a;
+      console.log(user, examen, preguntas);
 
-      const select = document.getElementById("mySelect");
       const final = document.getElementById("finalizar");
-
-      function getFormattedDateTime() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, "0");
-        const day = String(now.getDate()).padStart(2, "0");
-        const hours = String(now.getHours()).padStart(2, "0");
-        const minutes = String(now.getMinutes()).padStart(2, "0");
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
-      }
+      const table = document
+        .getElementById("myTable")
+        .getElementsByTagName("tbody")[0];
 
       async function loadData() {
         try {
+          const [datePart, timePart] = examen.fecha.split(", ");
+
+          // Descomponer la fecha (día/mes/año)
+          const [day, month, year] = datePart.split("/");
+
+          // Reorganizar y formatear en el nuevo formato
+          const formattedDate = `${year}-${month}-${day} ${timePart}`;
           // Envía los datos al endpoint
-          const response = await fetch("http://localhost:3000/laboratorio", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          const response = await fetch(
+            "http://localhost:3000/programa/id/" +
+              examen.cod_a +
+              "/" +
+              formattedDate,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
 
           console.log(response);
 
@@ -310,13 +319,49 @@
             const result = await response.json();
             //alert("Datos enviados correctamente: " + JSON.stringify(result));
             console.log(result);
+            localStorage.setItem("examenCompleto", JSON.stringify(result));
+            const optionElement = document.createElement("option");
+            optionElement.value = result.lugar;
+            optionElement.textContent = result.lugar;
+            select.appendChild(optionElement);
 
-            result.forEach((laboratorio) => {
-              const optionElement = document.createElement("option");
-              optionElement.value = laboratorio.id_l;
-              optionElement.textContent = laboratorio.ubicacion;
-              select.appendChild(optionElement);
+            const [datePart, timePart] = result.fecha.split(", ");
+
+            // Descomponer la fecha (día/mes/año)
+            const [day, month, year] = datePart.split("/");
+
+            // Crear un objeto Date en la hora local Colombiana
+            const localDate = new Date(`${year}-${month}-${day}T${timePart}`);
+
+            // Ajustar el tiempo a la zona horaria de Colombia (UTC-5)
+            localDate.setHours(localDate.getHours() - 5);
+
+            // Convertir al formato requerido por datetime-local
+            const formattedDate = localDate.toISOString().slice(0, 16);
+
+            // Asignar al campo datetime-local
+            fechaInput.value = formattedDate;
+
+            result.preguntas.forEach((pregunta) => {
+              const newRow = table.insertRow();
+              // Insertar celdas en la fila
+              const cell1 = newRow.insertCell(0);
+              const cell2 = newRow.insertCell(1);
+              const cell3 = newRow.insertCell(2);
+              const cell4 = newRow.insertCell(3);
+              // Asignar contenido a las celdas
+              cell1.innerText = pregunta.id_pregunta;
+              cell2.innerHTML = `<span class="gray-box">${pregunta.enunciado}</div>`;
+              cell3.innerText = pregunta.tipo;
+              cell4.innerText = pregunta.tiempo;
             });
+
+            // result.forEach((laboratorio) => {
+            //   const optionElement = document.createElement("option");
+            //   optionElement.value = laboratorio.id_l;
+            //   optionElement.textContent = laboratorio.ubicacion;
+            //   select.appendChild(optionElement);
+            // });
           } else {
             const result = await response.json();
             console.log(result);
@@ -329,41 +374,26 @@
 
       loadData();
 
-      //const formattedForDisplay = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // Para tu formato deseado
-      const now = getFormattedDateTime();
-      // Asignar al input el valor para datetime-local
-      const datetimePicker = document.getElementById("meeting-time");
-      if (fecha) {
-        const date = new Date(fecha);
-        const colombiaOffset = -5; // UTC-5
-        date.setHours(date.getHours() + colombiaOffset);
-        const localDate = date.toISOString().slice(0, 16);
-
-        datetimePicker.value = localDate;
-      } else {
-        datetimePicker.value = now;
-      }
-
-      // Restringir valores anteriores
-      datetimePicker.min = now;
-
-      // Mostrar formato personalizado en consola (o úsalo donde lo necesites)
-      //console.log("Fecha y hora en formato deseado:", formattedForDisplay);
-
-      // Validar cada vez que se intente cambiar el valor
-      datetimePicker.addEventListener("input", () => {
-        const selectedValue = new Date(datetimePicker.value);
-        const currentValue = new Date(getFormattedDateTime());
-        if (selectedValue < currentValue) {
-          alert("No puedes seleccionar una fecha u hora anterior a la actual.");
-          datetimePicker.value = getFormattedDateTime(); // Reiniciar al valor actual
+      setTimeout(() => {
+        if (preguntas) {
+          preguntas.forEach((pregunta) => {
+            const newRow = table.insertRow();
+            // Insertar celdas en la fila
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            const cell3 = newRow.insertCell(2);
+            const cell4 = newRow.insertCell(3);
+            // Asignar contenido a las celdas
+            cell1.innerText = pregunta.id_pregunta;
+            cell2.innerHTML = `<span class="gray-box">${pregunta.enunciado}</div>`;
+            cell3.innerText = pregunta.tipo;
+            cell4.innerText = pregunta.tiempo;
+          });
         }
-        console.log(selectedValue);
-        localStorage.setItem("fecha", JSON.stringify(selectedValue));
-      });
+      }, 500);
 
       programarBtn.addEventListener("click", async () => {
-        const rawValue = datetimePicker.value;
+        const rawValue = fechaInput.value;
         if (!rawValue) {
           alert("Selecciona una fecha y hora primero.");
           return;
@@ -384,7 +414,7 @@
           const resultados = await Promise.all(
             preguntas.map(async (pregunta) => {
               let obj = {
-                laboratorio: +select.value,
+                laboratorio: examenCompleto.lugar_id,
                 id_p: user.id,
                 id_pregunta: pregunta.id_pregunta,
                 fecha: formattedDate,
@@ -432,24 +462,6 @@
       addBtn.addEventListener("click", () => {
         window.location.href = "AgregarPreguntas.html";
       });
-      const table = document
-        .getElementById("myTable")
-        .getElementsByTagName("tbody")[0];
-      if (preguntas) {
-        preguntas.forEach((pregunta) => {
-          const newRow = table.insertRow();
-          // Insertar celdas en la fila
-          const cell1 = newRow.insertCell(0);
-          const cell2 = newRow.insertCell(1);
-          const cell3 = newRow.insertCell(2);
-          const cell4 = newRow.insertCell(3);
-          // Asignar contenido a las celdas
-          cell1.innerText = pregunta.id_pregunta;
-          cell2.innerHTML = `<span class="gray-box">${pregunta.enunciado}</div>`;
-          cell3.innerText = pregunta.tipo;
-          cell4.innerText = pregunta.tiempo;
-        });
-      }
     </script>
   </body>
 </html>
