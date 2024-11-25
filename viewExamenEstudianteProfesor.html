@@ -176,7 +176,8 @@
           Usuario</a
         >
         <!-- Enlace para acceder a las asignaturas -->
-        <a href="UsuariosConsultarExamen.html">Asignaturas</a>
+        <a href="Profesor.html">Asignaturas</a>
+        <a href="ProfesorExamenes.html">Examenes</a>
       </div>
       <!-- Enlace para cerrar sesión -->
       <div class="logout" id="logout">Cerrar sesión</div>
@@ -197,6 +198,7 @@
     </div>
     <script>
       const user = JSON.parse(localStorage.getItem("itemData"));
+      const estudiante = JSON.parse(localStorage.getItem("estudiante"));
       const examen = JSON.parse(localStorage.getItem("examen"));
       const examenCompleto = JSON.parse(localStorage.getItem("examenCompleto"));
 
@@ -219,7 +221,7 @@
               "/" +
               formattedDate +
               "/estudiante/" +
-              user.id,
+              estudiante.id,
             {
               method: "GET",
               headers: {
@@ -474,7 +476,7 @@
       const logoutBtn = document.getElementById('logout');
       logoutBtn.addEventListener('click', () => {
         localStorage.clear();
-        window.location.href = "Vista_Loging.html";
+        window.location.href = "Vista_LogingProfesor.html";
       });
     </script>
   </body>

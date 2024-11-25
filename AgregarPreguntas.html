@@ -171,7 +171,7 @@
         <a href="ProfesorExamenes.html">Examenes</a>
       </div>
       <!-- Enlace para cerrar sesión -->
-      <div class="logout">Cerrar sesión</div>
+      <div class="logout" id="logout">Cerrar sesión</div>
     </div>
 
     <!-- Contenido principal con el banco de preguntas -->
@@ -339,6 +339,12 @@
       }
 
       loadData();
+
+      const logoutBtn = document.getElementById('logout');
+      logoutBtn.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = "Vista_LogingProfesor.html";
+      });
     </script>
   </body>
 </html>

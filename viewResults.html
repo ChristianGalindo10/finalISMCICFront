@@ -201,6 +201,21 @@
         background-color: #fafafa; /* Color de fondo para celdas */
         color: #333; /* Color de texto */
       }
+
+      .button-action {
+        background-color: #5f4b8b; /* Color de fondo */
+        color: white; /* Color de texto */
+        border: none; /* Sin borde */
+        border-radius: 20px; /* Bordes redondeados */
+        padding: 8px 20px; /* Espaciado interno */
+        cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+        transition: background-color 0.3s ease; /* Transición suave al cambiar de color */
+      }
+
+      /* Efecto hover para los botones */
+      .button-action:hover {
+        background-color: #4a3a6b; /* Color de fondo al pasar el cursor */
+      }
     </style>
   </head>
   <body>
@@ -227,7 +242,7 @@
     <!-- Contenido principal con el formulario de programar examen -->
     <div class="content">
       <div class="exam-form-container">
-        <h2 id="titulo">Ver Examen ...</h2>
+        <h2 id="titulo">Ver Resultados Examen ...</h2>
 
         <!-- Campos de fecha y hora -->
         <!-- <input type="text" placeholder="Fecha">
@@ -245,10 +260,11 @@
         <table class="question-table" id="myTable">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Descripción</th>
-              <th>Tipo</th>
-              <th>Tiempo</th>
+              <th>Grupo</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Nota</th>
+              <th>Acción</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -257,8 +273,6 @@
         <!-- Selectores de lugar y grupo -->
         <label>Lugar:</label>
         <select id="mySelect" disabled></select>
-
-        <a href="viewResults.html" style="display: none;" id="verResultados">Ver resultados</a>
 
       </div>
     </div>
@@ -275,7 +289,7 @@
 
       const programarBtn = document.getElementById("programarBtn");
       document.getElementById("titulo").innerText =
-        "Ver Examen " + examen.nom_a;
+        "Ver Resultados Examen " + examen.nom_a;
       console.log(user, examen, preguntas);
 
       const final = document.getElementById("finalizar");
@@ -294,10 +308,10 @@
           const formattedDate = `${year}-${month}-${day} ${timePart}`;
           // Envía los datos al endpoint
           const response = await fetch(
-            "http://localhost:3000/programa/id/" +
+            "http://localhost:3000/responde/results/" +
               examen.cod_a +
               "/" +
-              formattedDate,
+              formattedDate + "/profesor/" + user.id,
             {
               method: "GET",
               headers: {
@@ -312,13 +326,13 @@
           if (response.ok) {
             const result = await response.json();
             //alert("Datos enviados correctamente: " + JSON.stringify(result));
-            localStorage.setItem("examenCompleto", JSON.stringify(result));
+            console.log(result);
             const optionElement = document.createElement("option");
-            optionElement.value = result.lugar;
-            optionElement.textContent = result.lugar;
+            optionElement.value = examenCompleto.lugar;
+            optionElement.textContent = examenCompleto.lugar;
             select.appendChild(optionElement);
 
-            const [datePart, timePart] = result.fecha.split(", ");
+            const [datePart, timePart] = examenCompleto.fecha.split(", ");
 
             // Descomponer la fecha (día/mes/año)
             const [day, month, year] = datePart.split("/");
@@ -326,38 +340,35 @@
             // Crear un objeto Date en la hora local Colombiana
             const localDate = new Date(`${year}-${month}-${day}T${timePart}`);
 
-            if(localDate < new Date()){
-              resultados.style.display = 'block';
-            }
-
             // Ajustar el tiempo a la zona horaria de Colombia (UTC-5)
             localDate.setHours(localDate.getHours() - 5);
+
             // Convertir al formato requerido por datetime-local
             const formattedDate = localDate.toISOString().slice(0, 16);
 
             // Asignar al campo datetime-local
             fechaInput.value = formattedDate;
 
-            result.preguntas.forEach((pregunta) => {
+            result.forEach((resultado) => {
               const newRow = table.insertRow();
-              // Insertar celdas en la fila
               const cell1 = newRow.insertCell(0);
               const cell2 = newRow.insertCell(1);
               const cell3 = newRow.insertCell(2);
               const cell4 = newRow.insertCell(3);
-              // Asignar contenido a las celdas
-              cell1.innerText = pregunta.id_pregunta;
-              cell2.innerHTML = `<span class="gray-box">${pregunta.enunciado}</div>`;
-              cell3.innerText = pregunta.tipo;
-              cell4.innerText = pregunta.tiempo;
+              const cell5 = newRow.insertCell(4);
+              cell1.innerText = resultado.grupo;
+              cell2.innerHTML = resultado.cod_e;
+              cell3.innerText = resultado.nom_e;
+              cell4.innerText = resultado.calificacion;
+              const asociarBtn = document.createElement("button");
+              asociarBtn.textContent = "Ver detalle";
+              asociarBtn.className = "button-action";
+              asociarBtn.addEventListener("click", () => {
+                localStorage.setItem("estudiante", JSON.stringify({id: resultado.cod_e}))
+                window.location.href = 'viewExamenEstudianteProfesor.html';
+              });
+              cell5.appendChild(asociarBtn);
             });
-
-            // result.forEach((laboratorio) => {
-            //   const optionElement = document.createElement("option");
-            //   optionElement.value = laboratorio.id_l;
-            //   optionElement.textContent = laboratorio.ubicacion;
-            //   select.appendChild(optionElement);
-            // });
           } else {
             const result = await response.json();
             console.log(result);

@@ -179,7 +179,7 @@
         <a href="#">Asignaturas</a>
       </div>
       <!-- Enlace para cerrar sesión -->
-      <div class="logout">Cerrar sesión</div>
+      <div class="logout" id="logout">Cerrar sesión</div>
     </div>
 
     <!-- Contenido principal con el contenedor de examen -->
@@ -581,6 +581,12 @@
       }
 
       loadData();
+
+      const logoutBtn = document.getElementById('logout');
+      logoutBtn.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = "Vista_Loging.html";
+      });
     </script>
   </body>
 </html>

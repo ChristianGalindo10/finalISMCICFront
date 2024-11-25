@@ -142,7 +142,7 @@
         >
         <a href="#">Consultar exámenes</a>
       </div>
-      <div class="logout">Cerrar sesión</div>
+      <div class="logout" id="logout">Cerrar sesión</div>
     </div>
     <div class="content">
       <h2>Exámenes Disponibles</h2>
@@ -326,6 +326,12 @@
       }
 
       loadData();
+
+      const logoutBtn = document.getElementById('logout');
+      logoutBtn.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = "Vista_Loging.html";
+      });
     </script>
   </body>
 </html>

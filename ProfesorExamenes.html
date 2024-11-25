@@ -168,7 +168,7 @@
         <a href="#">Examenes</a>
       </div>
       <!-- Enlace para cerrar sesión -->
-      <div class="logout">Cerrar sesión</div>
+      <div class="logout" id="logout">Cerrar sesión</div>
     </div>
 
     <!-- Contenido principal -->
@@ -300,6 +300,12 @@
       }
 
       loadData();
+
+      const logoutBtn = document.getElementById('logout');
+      logoutBtn.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = "Vista_LogingProfesor.html";
+      });
     </script>
   </body>
 </html>
