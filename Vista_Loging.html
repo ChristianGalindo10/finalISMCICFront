@@ -131,8 +131,8 @@
           // Maneja la respuesta
           if (response.ok) {
             const result = await response.json();
-            //alert("Datos enviados correctamente: " + JSON.stringify(result));
-            window.location.href = 'Profesor.html';
+            localStorage.setItem('itemData', JSON.stringify(result));
+            window.location.href = 'UsuariosConsultarExamen.html';
           } else {
             alert("Error al enviar los datos: " + response.statusText);
           }
